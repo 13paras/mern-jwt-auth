@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* Base Options */
+    "target": "es2022", // Or "ESNext" if you want to always use the latest
+    "module": "NodeNext", // Crucial for modern Node.js module resolution
+    "moduleResolution": "NodeNext", // MUST be consistent with "module"
+    "esModuleInterop": true, // Important for interoperability between CommonJS and ES modules
+    "forceConsistentCasingInFileNames": true, // Prevents issues with case-sensitive file systems
+    "strict": true, // Enables all strict type checking options
+    "skipLibCheck": true, // Improves build performance by skipping type checking of declaration files
+    "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type.
+    "noUnusedLocals": true, // Report errors on unused locals.
+    "noUnusedParameters": true, // Report errors on unused parameters.
+    "noImplicitReturns": true, // Report error when not all code paths in function return a value
+    "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statements.
+    "allowSyntheticDefaultImports": true, // Allow 'import x from y' when a module doesn't have a default export.
+    "resolveJsonModule": true, // Allows importing JSON files as modules
+    "isolatedModules": true, // Ensures each file can be compiled independently (important for build tools)
+    "verbatimModuleSyntax": true, // Ensures that imports and exports are written as they will appear in the output.
+    "declaration": true, // Generate declaration files (.d.ts) for type checking in other projects
+    "sourceMap": true, // Generate source maps for debugging
+    "outDir": "./dist", // Output directory for compiled JavaScript
+    "baseUrl": "./src", // Base directory to resolve non-relative module imports
+    "paths": {
+        "@/*": ["*"] // Enables imports like import something from "@/components/something"
+    },
+    "lib": ["es2022"], // Target environment: Node.js (no need for DOM libs in Node.js)
+    "types": ["node"] // Include type definitions for Node.js APIs
+  },
+  "include": ["src/**/*"], // Include all .ts, .tsx, .js and .jsx files in the src folder
+  "exclude": ["node_modules", "dist"] // Exclude node_modules and dist folders
+}

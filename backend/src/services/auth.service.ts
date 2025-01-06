@@ -3,6 +3,7 @@ import {
   CONFLICT,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
+  TOO_MANY_REQUESTS,
   UNAUTHORIZED,
 } from "@/constants/http.js";
 import VerificationCodeType from "@/constants/verificationCodeTypes.js";
@@ -10,8 +11,17 @@ import SessionModel from "@/models/session.model.js";
 import UserModel from "@/models/user.model.js";
 import VerificationCodeModel from "@/models/verificationCode.model.js";
 import appAssert from "@/utils/appAssert.js";
-import { ONE_DAY_MS, oneYearFromNow, thirtyDaysFromNow } from "@/utils/date.js";
-import { getVerifyEmailTemplate } from "@/utils/emailTemplates.js";
+import {
+  fiveMinutesAgo,
+  ONE_DAY_MS,
+  oneHourFromNow,
+  oneYearFromNow,
+  thirtyDaysFromNow,
+} from "@/utils/date.js";
+import {
+  getPasswordResetTemplate,
+  getVerifyEmailTemplate,
+} from "@/utils/emailTemplates.js";
 import {
   refreshTokenSignOptions,
   signToken,
@@ -219,5 +229,52 @@ export const verifyEmail = async (code: string) => {
 
   return {
     user: updatedUser.omitPassword(),
+  };
+};
+
+export const sendPasswordResetEmail = async (email: string) => {
+  // get the user by email
+  const user = await UserModel.findOne({ email });
+  appAssert(user, NOT_FOUND, "User not found");
+
+  // check email rate limit
+  const fiveMinAgo = fiveMinutesAgo();
+  const count = await VerificationCodeModel.countDocuments({
+    userId: user._id,
+    type: VerificationCodeType.PasswordReset,
+    createdAt: { $gt: fiveMinAgo },
+  });
+  appAssert(
+    count <= 1,
+    TOO_MANY_REQUESTS,
+    "Too many requests, please try again later."
+  );
+
+  // create verification code
+  const expiresAt = oneHourFromNow();
+  const verificationCode = await VerificationCodeModel.create({
+    userId: user._id,
+    type: VerificationCodeType.PasswordReset,
+    expiresAt,
+  });
+  // send password reset email
+  const url = `${config.BASE_URL}/password/reset?code=${
+    verificationCode._id
+  }&exp=${expiresAt.getTime()}`;
+
+  const { data, error } = await sendMail({
+    to: email,
+    ...getPasswordResetTemplate(url),
+  });
+
+  appAssert(
+    data?.id,
+    INTERNAL_SERVER_ERROR,
+    `${error?.name} - ${error?.message}`
+  );
+  // return success
+  return {
+    url,
+    emailId: data.id,
   };
 };

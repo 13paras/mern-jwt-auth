@@ -11,6 +11,7 @@ const _config = {
   BASE_URL: process.env.BASE_URL,
   CORS_ORIGIN: process.env.CORS_ORIGIN,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
 };
 
 export const config = Object.freeze(_config); // it means it is read only and with freeze we can't do anything with this

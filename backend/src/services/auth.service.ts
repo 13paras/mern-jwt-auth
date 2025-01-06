@@ -11,12 +11,14 @@ import UserModel from "@/models/user.model.js";
 import VerificationCodeModel from "@/models/verificationCode.model.js";
 import appAssert from "@/utils/appAssert.js";
 import { ONE_DAY_MS, oneYearFromNow, thirtyDaysFromNow } from "@/utils/date.js";
+import { getVerifyEmailTemplate } from "@/utils/emailTemplates.js";
 import {
   refreshTokenSignOptions,
   signToken,
   verifyToken,
   type RefreshTokenPayload,
 } from "@/utils/jwt.js";
+import { sendMail } from "@/utils/sendMail.js";
 import jwt from "jsonwebtoken";
 
 export type CreateAccountParams = {
@@ -50,7 +52,16 @@ export const createAccount = async (data: CreateAccountParams) => {
     expiresAt: oneYearFromNow(),
   });
 
+  const url = `${config.BASE_URL}/verify-email/${verificationCode._id}`;
   // send verification email
+  const { error } = await sendMail({
+    to: user.email,
+    ...getVerifyEmailTemplate(url),
+  });
+
+  if (error) {
+    console.log(error);
+  }
   // create session
   const session = await SessionModel.create({
     userId,
@@ -188,15 +199,13 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
 };
 
 export const verifyEmail = async (code: string) => {
-  // get the verification code
   const validCode = await VerificationCodeModel.findOne({
     _id: code,
     type: VerificationCodeType.EmailVerification,
     expiresAt: { $gt: new Date() },
   });
-  appAssert(validCode, NOT_FOUND, "Invalid or expired Verification Code!");
+  appAssert(validCode, NOT_FOUND, "Invalid or expired verification code");
 
-  // update the user to verified code
   const updatedUser = await UserModel.findByIdAndUpdate(
     validCode.userId,
     {
@@ -204,12 +213,10 @@ export const verifyEmail = async (code: string) => {
     },
     { new: true }
   );
-  appAssert(updatedUser, INTERNAL_SERVER_ERROR, "Failed to verify email!");
+  appAssert(updatedUser, INTERNAL_SERVER_ERROR, "Failed to verify email");
 
-  // delete verification code
   await validCode.deleteOne();
 
-  // return user
   return {
     user: updatedUser.omitPassword(),
   };

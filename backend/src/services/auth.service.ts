@@ -1,5 +1,10 @@
 import { config } from "@/config/config.js";
-import { CONFLICT, UNAUTHORIZED } from "@/constants/http.js";
+import {
+  CONFLICT,
+  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
+  UNAUTHORIZED,
+} from "@/constants/http.js";
 import VerificationCodeType from "@/constants/verificationCodeTypes.js";
 import SessionModel from "@/models/session.model.js";
 import UserModel from "@/models/user.model.js";
@@ -179,5 +184,33 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
   return {
     accessToken,
     newRefreshToken,
+  };
+};
+
+export const verifyEmail = async (code: string) => {
+  // get the verification code
+  const validCode = await VerificationCodeModel.findOne({
+    _id: code,
+    type: VerificationCodeType.EmailVerification,
+    expiresAt: { $gt: new Date() },
+  });
+  appAssert(validCode, NOT_FOUND, "Invalid or expired Verification Code!");
+
+  // update the user to verified code
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    validCode.userId,
+    {
+      verified: true,
+    },
+    { new: true }
+  );
+  appAssert(updatedUser, INTERNAL_SERVER_ERROR, "Failed to verify email!");
+
+  // delete verification code
+  await validCode.deleteOne();
+
+  // return user
+  return {
+    user: updatedUser.omitPassword(),
   };
 };

@@ -5,5 +5,6 @@ export const hashValue = async (val: string, saltRounds?: number) => {
 };
 
 export const compareValue = async (val: string, hashedValue: string) => {
+  // console.log("Both passwords", { val, hashedValue });
   return await bcrypt.compare(val, hashedValue).catch(() => false);
 };

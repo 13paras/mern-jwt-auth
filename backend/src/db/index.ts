@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import { config } from "../config/config.js";
-import { DB_NAME } from "../constants.js";
 
-
+const DB_NAME = "mern-jwt-auth";
 
 const connectDB = async () => {
   try {

@@ -1,7 +1,5 @@
-import { model, Schema, type Document } from "mongoose";
-import { string } from "zod";
-import bcrypt from "bcrypt";
 import { compareValue, hashValue } from "@/utils/bcrypt.js";
+import { model, Schema, type Document } from "mongoose";
 export interface UserDocument extends Document {
   email: string;
   password: string;
@@ -33,8 +31,8 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.comparePassword = async function (val: string) {
-  return compareValue(val, this.password);
+userSchema.methods.comparePassword = async function (password: string) {
+  return compareValue(password, this.password);
 };
 
 userSchema.methods.omitPassword = function () {

@@ -1,7 +1,7 @@
 import { config } from "@/config/config.js";
 import type { SessionDocument } from "@/models/session.model.js";
 import type { UserDocument } from "@/models/user.model.js";
-import jwt, { type SignOptions } from "jsonwebtoken";
+import jwt, { type SignOptions, type VerifyOptions } from "jsonwebtoken";
 
 export type RefreshTokenPayload = {
   sessionId: SessionDocument["_id"];
@@ -39,4 +39,26 @@ export const signToken = (
     ...defaults,
     ...signOpts,
   });
+};
+
+export const verifyToken = <TPayload extends object = AccessTokenPayload>(
+  token: string,
+  options?: VerifyOptions & {
+    secret?: string;
+  }
+) => {
+  const { secret = config.JWT_SECRET_KEY!, ...verifyOpts } = options || {};
+  try {
+    const payload = jwt.verify(token, secret, {
+      ...defaults,
+      ...verifyOpts,
+    }) as TPayload;
+    return {
+      payload,
+    };
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
 };

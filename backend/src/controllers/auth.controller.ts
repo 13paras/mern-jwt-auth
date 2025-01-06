@@ -1,9 +1,19 @@
-import { CREATED, OK } from "@/constants/http.js";
+import { CREATED, OK, UNAUTHORIZED } from "@/constants/http.js";
 import SessionModel from "@/models/session.model.js";
 import { loginSchema, registerSchema } from "@/schemas/auth.schema.js";
-import { createAccount, loginUser } from "@/services/auth.service.js";
+import {
+  createAccount,
+  loginUser,
+  refreshUserAccessToken,
+} from "@/services/auth.service.js";
+import appAssert from "@/utils/appAssert.js";
 import catchErrors from "@/utils/catchErrors.js";
-import { clearAuthCookies, setAuthCookies } from "@/utils/cookies.js";
+import {
+  clearAuthCookies,
+  getAccessTokenCookieOptions,
+  getRefreshTokenCookieOptions,
+  setAuthCookies,
+} from "@/utils/cookies.js";
 import { verifyToken } from "@/utils/jwt.js";
 import { z } from "zod";
 
@@ -48,4 +58,25 @@ export const logoutHandler = catchErrors(async (req, res) => {
 
   clearAuthCookies(res);
   res.status(OK).json({ message: "Logout Successful" });
+});
+
+export const refreshHandler = catchErrors(async (req, res) => {
+  const refreshToken = (req.cookies.refreshToken as string) || undefined;
+  appAssert(refreshToken, UNAUTHORIZED, "Missing Refresh Token");
+
+  // call a service
+  const { accessToken, newRefreshToken } = await refreshUserAccessToken(
+    refreshToken
+  );
+
+  if (newRefreshToken) {
+    res.cookie("refreshToken", newRefreshToken, getRefreshTokenCookieOptions());
+  }
+
+  return res
+    .status(OK)
+    .cookie("accessToken", accessToken, getAccessTokenCookieOptions())
+    .json({
+      message: "Access token refreshed",
+    });
 });

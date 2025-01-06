@@ -3,6 +3,7 @@ import {
   logoutHandler,
   refreshHandler,
   registerHandler,
+  resetPasswordHandler,
   sendPasswordResetHandler,
   verifyEmailHandler,
 } from "@/controllers/auth.controller.js";
@@ -18,5 +19,6 @@ authRouter.get("/refresh", refreshHandler);
 authRouter.get("/logout", logoutHandler);
 authRouter.get("/email/verify/:code", verifyEmailHandler);
 authRouter.post("/password/forgot", sendPasswordResetHandler);
+authRouter.post("/password/reset", resetPasswordHandler);
 
 export { authRouter };

@@ -27,6 +27,6 @@
     "lib": ["es2022"], // Target environment: Node.js (no need for DOM libs in Node.js)
     "types": ["node"] // Include type definitions for Node.js APIs
   },
-  "include": ["src/**/*"], // Include all .ts, .tsx, .js and .jsx files in the src folder
+  "include": ["src/**/*", "index.d.ts"], // Include all .ts, .tsx, .js and .jsx files in the src folder
   "exclude": ["node_modules", "dist"] // Exclude node_modules and dist folders
 }

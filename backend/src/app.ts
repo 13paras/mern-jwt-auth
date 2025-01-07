@@ -24,8 +24,16 @@ app.get("/health", async (req, res, next) => {
 });
 
 import { authRouter } from "./routes/auth.routes.js";
+import { authenticate } from "./middleware/authenticate.middleware.js";
+import { userRoutes } from "./routes/user.routes.js";
+import { sessionRouter } from "./routes/session.routes.js";
 
+// auth routes
 app.use("/auth", authRouter);
+
+// protected routes
+app.use("/user", authenticate, userRoutes);
+app.use("/sessions", authenticate, sessionRouter);
 
 app.use(errorHandler);
 

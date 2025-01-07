@@ -19,8 +19,8 @@ app.use(
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-app.get("/health", async (req, res, next) => {
-  res.status(OK).json({ message: "Namaste Everyone", status: "healthy" });
+app.get("/health", async (_, res) => {
+  res.status(OK).json({ message: "Namaste Everyone", status: "Healthy" });
 });
 
 import { authRouter } from "./routes/auth.routes.js";

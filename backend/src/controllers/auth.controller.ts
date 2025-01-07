@@ -24,7 +24,6 @@ import {
   setAuthCookies,
 } from "@/utils/cookies.js";
 import { verifyToken } from "@/utils/jwt.js";
-import { z } from "zod";
 
 export const registerHandler = catchErrors(async (req, res) => {
   // validate request

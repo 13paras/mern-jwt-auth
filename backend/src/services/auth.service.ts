@@ -30,7 +30,6 @@ import {
   type RefreshTokenPayload,
 } from "@/utils/jwt.js";
 import { sendMail } from "@/utils/sendMail.js";
-import jwt from "jsonwebtoken";
 
 export type CreateAccountParams = {
   email: string;

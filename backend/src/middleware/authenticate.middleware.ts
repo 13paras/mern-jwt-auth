@@ -4,7 +4,7 @@ import appAssert from "@/utils/appAssert.js";
 import { verifyToken } from "@/utils/jwt.js";
 import type { RequestHandler } from "express";
 
-const authenticate: RequestHandler = (req, res, next) => {
+const authenticate: RequestHandler = (req, _, next) => {
   const accessToken = req.cookies.accessToken as string | undefined;
   appAssert(
     accessToken,
@@ -21,8 +21,8 @@ const authenticate: RequestHandler = (req, res, next) => {
     AppErrorCode.InvalidAccessToken
   );
 
-  req.userId = payload.userId;
-  req.sessionId = payload.sessionId;
+  (req as any).userId = payload.userId;
+  (req as any).sessionId = payload.sessionId;
   next();
 };
 export { authenticate };

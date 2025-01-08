@@ -1,6 +1,7 @@
 import { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
-import { login, register } from "../lib/api";
+
 import { useMutation } from "@tanstack/react-query";
 import {
   Box,
@@ -15,6 +16,8 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+
+import { register } from "../lib/api";
 
 const Register = () => {
   const navigate = useNavigate();

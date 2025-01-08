@@ -5,11 +5,15 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AppContainer from "./components/AppContainer";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<AppContainer />} />
+      <Route path="/" element={<AppContainer />}>
+        <Route index element={<Profile />} />
+        <Route path="/settings" element={<Profile />} />
+      </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/email/verify/:code" element={<VerifyEmail />} />

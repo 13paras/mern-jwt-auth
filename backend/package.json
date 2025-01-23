@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && copy ./package.json ./dist",
-    "start": "node index.js"
+    "build": "tsc",
+    "start": "node index.js",
+    "postinstall": "cd ../frontend && npm install && npm run build"
   },
   "keywords": [],
   "author": "",
